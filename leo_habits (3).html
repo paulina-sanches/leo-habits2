@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Leo's Habits 🌿</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAF7;--bg2:#F2F0EA;--bg3:#E8E5DB;
+  --text:#2C2C2A;--text2:#5F5E5A;--text3:#888780;
+  --border:rgba(44,44,42,0.12);--border2:rgba(44,44,42,0.22);
+  --accent:#1D9E75;--accent2:#0F6E56;
+  --green:#639922;--amber:#EF9F27;--red:#D85A30;
+  --radius:12px;--radius-sm:8px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:88px;font-size:15px;font-weight:400;line-height:1.5}
+h1{font-size:32px;font-weight:700;color:var(--text);line-height:1.2}
+h2{font-size:24px;font-weight:600;color:var(--text);line-height:1.3}
+h3{font-size:20px;font-weight:600;color:var(--text);line-height:1.3}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--bg);border-top:0.5px solid var(--border);display:flex;max-width:480px;margin:0 auto}
+.nb{flex:1;padding:8px 0 12px;cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:2px;outline:none;transition:color .2s}
+.nb.on{color:var(--accent)}
+.nbar{display:block;width:18px;height:2px;background:var(--accent);border-radius:1px;visibility:hidden;margin-top:1px}
+.nb.on .nbar{visibility:visible}
+.wrap{max-width:480px;margin:0 auto}
+.view{padding:18px 14px 20px;display:none}
+.view.on{display:block}
+.card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.ctit{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px}
+.cat-h{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--text3);margin:14px 4px 6px}
+.cat-h:first-child{margin-top:4px}
+.hr{background:#fff;border:0.5px solid var(--border);border-left:3px solid var(--border);border-radius:0 var(--radius) var(--radius) 0;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;transition:all .2s}
+.hr.dn{background:var(--bg2);border-left-color:var(--accent)}
+.hr.wkly{border-left-color:var(--amber)}
+.chk{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:12px;color:white;background:transparent;transition:all .2s}
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.pb{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:3px}
+.pf{height:100%;border-radius:3px;transition:width .5s}
+.bdg{font-size:11px;font-weight:500;background:#FAEEDA;color:#633806;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.bdg-wk{font-size:10px;font-weight:600;background:#E1F5EE;color:#0F6E56;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mc{background:var(--bg2);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.ml{font-size:10px;font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.mv{font-size:32px;font-weight:700;line-height:1}
+.ms{font-size:12px;font-weight:400;color:var(--text3);margin-top:4px}
+.ins{font-size:13px;font-weight:400;line-height:1.6;padding:9px 12px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:7px;color:var(--text)}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:6px 0}
+.cd{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:default}
+.wg{display:grid;grid-template-columns:28px repeat(7,minmax(0,1fr)) 56px;gap:3px;align-items:center;margin-bottom:6px}
+.wc{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.wcount{font-size:11px;font-weight:600;color:var(--text2);text-align:right;padding-right:2px}
+input[type=text],input[type=number],input[type=date]{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:9px 11px;font-family:'Inter',sans-serif;color:var(--text);font-size:14px;font-weight:400;outline:none;width:100%}
+input[type=text]:focus,input[type=number]:focus,input[type=date]:focus{border-color:var(--accent);background:#fff}
+input.sm{padding:5px 7px;font-size:13px;font-weight:500;width:auto}
+.sbtn{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px;transition:background .2s}
+.sbtn:hover{background:var(--accent2)}
+.sbtn2{padding:10px 18px;background:var(--bg2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.fbtn{padding:7px 16px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg2);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;transition:all .18s;white-space:nowrap}
+.fbtn.on{background:var(--accent);color:white;border-color:var(--accent)}
+.week-row{display:flex;align-items:center;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:5px;gap:10px}
+.wbadge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.wkly-card{background:linear-gradient(0deg,var(--bg2),var(--bg2));border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.tbtn{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg2);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;transition:all .18s}
+.tbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
+.clr-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
+.clr-dot.on{border-color:var(--text);transform:scale(1.18)}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;opacity:.45;transition:opacity .2s;font-family:'Inter',sans-serif}
+.del-btn:hover{opacity:1}
+.edit-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 5px;opacity:.45;transition:opacity .2s;font-family:'Inter',sans-serif;color:var(--text2)}
+.edit-btn:hover{opacity:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-hidden{display:none}
+.lbl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block}
+.frow{margin-bottom:14px}
+.csel{display:flex;gap:6px;flex-wrap:wrap}
+select{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:9px 11px;font-family:'Inter',sans-serif;color:var(--text);font-size:14px;outline:none;width:100%;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5E5A' stroke-width='2'><polyline points='6 9 12 15 18 9'></polyline></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="nav" class="nav wrap"></div>
+  <div id="v-today" class="view on"></div>
+  <div id="v-week" class="view"></div>
+  <div id="v-month" class="view"></div>
+  <div id="v-trends" class="view"></div>
+  <div id="v-goals" class="view"></div>
+</div>
+
+<!-- Add Habit Modal -->
+<div id="modal" class="modal-overlay modal-hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h3>New habit</h3>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);font-family:'Inter',sans-serif">×</button>
+    </div>
+    <div class="frow" style="display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:end">
+      <div><span class="lbl">Icon</span><input type="text" id="new-icon" value="⭐" maxlength="2" style="text-align:center;font-size:24px;padding:8px 4px"></div>
+      <div><span class="lbl">Habit name</span><input type="text" id="new-name" placeholder="e.g. Learn Italian" maxlength="30"></div>
+    </div>
+    <div class="frow">
+      <span class="lbl">Category</span>
+      <select id="new-cat">
+        <option value="Nutrition">Nutrition</option>
+        <option value="Fitness">Fitness</option>
+        <option value="Sleep">Sleep</option>
+        <option value="Relationships">Relationships</option>
+        <option value="Personal" selected>Personal</option>
+      </select>
+    </div>
+    <div class="frow">
+      <span class="lbl">Type</span>
+      <div style="display:flex;gap:8px">
+        <button class="tbtn on" id="tbtn-bool" onclick="setType('bool')">Yes / No</button>
+        <button class="tbtn" id="tbtn-num" onclick="setType('num')">With target</button>
+      </div>
+    </div>
+    <div id="num-fields" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div><span class="lbl">Unit</span><input type="text" id="new-unit" placeholder="min, pages…" maxlength="10"></div>
+        <div><span class="lbl">Daily target</span><input type="number" id="new-def" placeholder="30" min="0"></div>
+      </div>
+    </div>
+    <div class="frow">
+      <span class="lbl">Days per week target</span>
+      <input type="number" id="new-wg" value="5" min="1" max="7" style="width:80px;text-align:center">
+    </div>
+    <div class="frow">
+      <span class="lbl">Color</span>
+      <div class="csel" style="margin-top:2px">
+        <div class="clr-dot on" style="background:#378ADD" data-c="#378ADD" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#7F77DD" data-c="#7F77DD" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#D85A30" data-c="#D85A30" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#639922" data-c="#639922" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#EF9F27" data-c="#EF9F27" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#D4537E" data-c="#D4537E" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#1D9E75" data-c="#1D9E75" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#BA7517" data-c="#BA7517" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#E24B4A" data-c="#E24B4A" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#5B8DEF" data-c="#5B8DEF" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#A855F7" data-c="#A855F7" onclick="pickColor(this)"></div>
+        <div class="clr-dot" style="background:#14B8A6" data-c="#14B8A6" onclick="pickColor(this)"></div>
+      </div>
+    </div>
+    <button class="sbtn" onclick="addHabit()">Add habit</button>
+    <div id="modal-err" style="color:#D85A30;font-size:12px;font-weight:500;text-align:center;margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
+<script>
+/* Each habit has:
+   - bool: true/false → tap done
+   - num: daily target (def), done when value≥def or manually tapped
+   - weekly: cumulative weekly minutes target (wgMin), no daily "done"
+   wg = days per week target (for bool/num)
+*/
+const BASE_H=[
+  // Nutrition
+  {id:'no_sat_fat',name:'No saturated fat',icon:'🥗',c:'#3B6D11',bool:true,wg:5,cat:'Nutrition'},
+  {id:'no_sugar',name:'No sugar',icon:'🍬',c:'#E24B4A',bool:true,wg:6,cat:'Nutrition'},
+  // Fitness
+  {id:'muscles',name:'Muscle workout',icon:'💪',c:'#639922',bool:true,wg:4,cat:'Fitness'},
+  {id:'ligaments',name:'Ligament strength',icon:'🦵',c:'#BA7517',bool:true,wg:3,cat:'Fitness'},
+  {id:'zone5',name:'Zone 5 cardio',icon:'🔥',c:'#D85A30',weekly:true,wgMin:30,unit:'min',cat:'Fitness'},
+  {id:'zone2',name:'Zone 2 cardio',icon:'🚴',c:'#EF9F27',weekly:true,wgMin:150,unit:'min',cat:'Fitness'},
+  // Sleep
+  {id:'sleep_score',name:'Sleep score 90%+',icon:'⭐',c:'#7F77DD',unit:'%',def:90,wg:6,cat:'Sleep'},
+  {id:'sleep_hours',name:'7+ hrs sleep',icon:'🌙',c:'#378ADD',unit:'hrs',def:7,wg:6,cat:'Sleep'},
+  // Relationships
+  {id:'call_dad',name:'Call dad',icon:'👨',c:'#1D9E75',bool:true,wg:1,cat:'Relationships'},
+  {id:'call_mom',name:'Call mom',icon:'👩',c:'#D4537E',bool:true,wg:1,cat:'Relationships'},
+  {id:'call_sister',name:'Call sister',icon:'👧',c:'#A855F7',bool:true,wg:1,cat:'Relationships'},
+  {id:'call_brother',name:'Call brother',icon:'👦',c:'#5B8DEF',bool:true,wg:1,cat:'Relationships'},
+  {id:'call_friends',name:'Call friends',icon:'🤝',c:'#14B8A6',bool:true,wg:1,cat:'Relationships'},
+  // Personal
+  {id:'leisure',name:'Leisure',icon:'🎮',unit:'min',def:45,c:'#EF9F27',wg:7,cat:'Personal'},
+  {id:'floss',name:'Floss',icon:'🦷',c:'#5B8DEF',bool:true,wg:7,cat:'Personal'},
+  {id:'reading',name:'Reading',icon:'📚',unit:'min',def:15,c:'#D85A30',wg:5,cat:'Personal'},
+];
+const CATS=['Nutrition','Fitness','Sleep','Relationships','Personal'];
+const START_DATE='2026-05-11';  /* Leo started tracking on this date */
+let logs={},goals={},weeklyGoals={},habitNames={},customH=[];
+let trendDays=30,trendFrom=null,trendTo=null,trendMode='preset';
+let calDate=(()=>{const t=new Date();const[sy,sm]=START_DATE.split('-').map(Number);
+  /* Open calendar at current month, or May 2026 if before */
+  if(t<new Date(sy,sm-1,1))return{y:sy,m:sm-1};
+  return{y:t.getFullYear(),m:t.getMonth()};
+})();
+let selDay=null,curTab='today',scoreChart=null;
+let newType='bool',newColor='#378ADD';
+
+function H(){return[...BASE_H,...customH].map(h=>({...h,name:habitNames[h.id]||h.name}));}
+function dailyH(){return H().filter(h=>!h.weekly);}  // habits tracked daily
+function weeklyH(){return H().filter(h=>h.weekly);}  // cumulative weekly habits
+
+/* ── STORAGE ── */
+function save(){
+  try{localStorage.setItem('leo_ht_v1',JSON.stringify({logs,goals,weeklyGoals,habitNames,customH}));}catch(e){}
+}
+function load(){
+  try{
+    const r=localStorage.getItem('leo_ht_v1');
+    if(r){const d=JSON.parse(r);if(d.logs)logs=d.logs;if(d.goals)goals=d.goals;if(d.weeklyGoals)weeklyGoals=d.weeklyGoals;if(d.habitNames)habitNames=d.habitNames;if(d.customH)customH=d.customH;}
+  }catch(e){}
+  H().forEach(h=>{
+    if(h.weekly){if(weeklyGoals[h.id]==null)weeklyGoals[h.id]=h.wgMin;}
+    else{if(goals[h.id]==null)goals[h.id]=h.wg;if(h.def!=null&&goals[h.id+'_daily']==null)goals[h.id+'_daily']=h.def;}
+  });
+}
+
+/* ── DATE HELPERS ── */
+function ds(d){return[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
+function T(){return ds(new Date());}
+function addD(s,n){const[y,m,d]=s.split('-').map(Number);return ds(new Date(y,m-1,d+n));}
+function dRange(from,to){const days=[];let d=from;while(d<=to){days.push(d);d=addD(d,1);}return days;}
+function lastN(n){const t=T();return Array.from({length:n},(_,i)=>addD(t,-(n-1-i)));}
+function weekOf(ref){
+  const[y,m,d]=(ref||T()).split('-').map(Number);const dt=new Date(y,m-1,d);
+  const off=dt.getDay()===0?-6:1-dt.getDay();
+  return Array.from({length:7},(_,i)=>ds(new Date(y,m-1,d+off+i)));
+}
+function mDays(y,m){
+  const f=new Date(y,m,1),l=new Date(y,m+1,0);
+  const pad=f.getDay()===0?6:f.getDay()-1,days=[];
+  for(let i=pad;i>0;i--)days.push({date:ds(new Date(y,m,1-i)),own:false});
+  for(let i=1;i<=l.getDate();i++)days.push({date:ds(new Date(y,m,i)),own:true});
+  const rem=7-(days.length%7);if(rem<7)for(let i=1;i<=rem;i++)days.push({date:ds(new Date(y,m+1,i)),own:false});
+  return days;
+}
+function splitWeeks(days){
+  if(!days.length)return[];
+  const weeks=[];let week=[];
+  days.forEach(d=>{
+    const[y,m,dy]=d.split('-').map(Number);
+    const dow=new Date(y,m-1,dy).getDay()===0?7:new Date(y,m-1,dy).getDay();
+    week.push(d);
+    if(dow===7){weeks.push(week);week=[];}
+  });
+  if(week.length)weeks.push(week);
+  return weeks;
+}
+function getTrendDays(){
+  if(trendMode==='custom'&&trendFrom&&trendTo&&trendFrom<=trendTo){return dRange(trendFrom,trendTo<=T()?trendTo:T());}
+  return lastN(trendDays);
+}
+
+/* ── COMPLETION LOGIC ── */
+function isDone(date,h){
+  const e=logs[date]?.[h.id];if(!e)return false;
+  if(h.bool)return !!e.done;
+  if(h.weekly)return false; // weekly habits don't count toward daily score
+  // numeric: done if manually toggled OR value reaches daily target
+  const dailyTgt=goals[h.id+'_daily']??h.def;
+  return !!e.done||(e.value!=null&&e.value>=dailyTgt);
+}
+
+function dScore(date){
+  if(date<START_DATE)return 0;
+  const dh=dailyH();
+  return dh.filter(h=>isDone(date,h)).length/dh.length;
+}
+
+function gStreak(hid){
+  const h=H().find(x=>x.id===hid);if(!h||h.weekly)return 0;
+  let n=0,d=T();
+  while(isDone(d,h)){n++;d=addD(d,-1);}
+  return n;
+}
+
+/* count days a habit was completed in a list of dates */
+function daysDone(hid,days){
+  const h=H().find(x=>x.id===hid);if(!h)return 0;
+  return days.filter(d=>d<=T()&&isDone(d,h)).length;
+}
+
+/* weekly minute sum for a weekly habit */
+function weeklySum(hid,days){
+  return days.filter(d=>d<=T()).reduce((s,d)=>s+(+(logs[d]?.[hid]?.value||0)),0);
+}
+
+/* % of weeks where habit hit its weekly goal */
+function gWeeklyCons(h,days){
+  const weeks=splitWeeks(days);
+  const complete=weeks.filter(w=>w[w.length-1]<=T()&&w[0]>=START_DATE);
+  if(!complete.length)return null;
+  let met=0;
+  complete.forEach(w=>{
+    if(h.weekly){
+      const sum=weeklySum(h.id,w);
+      const tgt=weeklyGoals[h.id]??h.wgMin;
+      if(sum>=tgt)met++;
+    }else{
+      const n=daysDone(h.id,w);
+      const tgt=goals[h.id]??h.wg;
+      if(n>=tgt)met++;
+    }
+  });
+  return{met,total:complete.length,pct:Math.round(met/complete.length*100)};
+}
+
+function gGrade(p){if(p>=90)return{g:'A',c:'#639922'};if(p>=75)return{g:'B',c:'#EF9F27'};if(p>=60)return{g:'C',c:'#D85A30'};if(p>=40)return{g:'D',c:'#993C1D'};return{g:'F',c:'#A32D2D'};}
+function pb(p,c){return`<div class="pb"><div class="pf" style="width:${Math.min(p,100)}%;background:${c}"></div></div>`;}
+
+function tog(date,hid){
+  if(!logs[date])logs[date]={};if(!logs[date][hid])logs[date][hid]={};
+  logs[date][hid].done=!logs[date][hid].done;save();
+}
+function setV(date,hid,v){
+  if(!logs[date])logs[date]={};if(!logs[date][hid])logs[date][hid]={};
+  logs[date][hid].value=v===''?null:+v;
+  // auto-set done for num habits when target hit
+  const h=H().find(x=>x.id===hid);
+  if(h&&!h.bool&&!h.weekly){
+    const tgt=goals[hid+'_daily']??h.def;
+    logs[date][hid].done=(v!==''&&+v>=tgt);
+  }
+  save();
+}
+
+/* ── NAV ── */
+const TABS=[{id:'today',icon:'☀️',label:'Today'},{id:'week',icon:'📅',label:'Week'},{id:'month',icon:'🗓️',label:'Month'},{id:'trends',icon:'📊',label:'Trends'},{id:'goals',icon:'🎯',label:'Goals'}];
+function rNav(){
+  document.getElementById('nav').innerHTML=TABS.map(t=>`
+    <button class="nb${curTab===t.id?' on':''}" onclick="go('${t.id}')">
+      <span style="font-size:18px">${t.icon}</span><span>${t.label}</span><span class="nbar"></span>
+    </button>`).join('');
+}
+function go(id){
+  document.getElementById('v-'+curTab).classList.remove('on');curTab=id;
+  document.getElementById('v-'+id).classList.add('on');rNav();
+  ({today:rToday,week:rWeek,month:rMonth,trends:rTrends,goals:rGoals})[id]();
+}
+
+/* ── TODAY ── */
+function ring(pct,sub){
+  const r=72,c=2*Math.PI*r,o=(c*(1-pct/100)).toFixed(1);
+  return`<div style="display:flex;justify-content:center;margin:18px 0 22px">
+    <div style="position:relative;width:170px;height:170px">
+      <svg width="170" height="170" style="transform:rotate(-90deg);display:block">
+        <circle cx="85" cy="85" r="${r}" fill="none" stroke="#E8E5DB" stroke-width="14"/>
+        <circle cx="85" cy="85" r="${r}" fill="none" stroke="#1D9E75" stroke-width="14"
+          stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${o}" style="transition:stroke-dashoffset .7s ease"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <span style="font-size:44px;font-weight:700;line-height:1;color:var(--text)">${pct}%</span>
+        <span style="font-size:12px;font-weight:500;color:var(--text3);margin-top:5px">${sub}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function rToday(){
+  const t=T(),dl=logs[t]||{},dh=dailyH(),wh=weeklyH();
+  const done=dh.filter(h=>isDone(t,h)).length,pct=Math.round(done/dh.length*100);
+  const dlbl=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const wdays=weekOf();
+
+  let html=`<div style="text-align:center;padding-top:6px">
+    <div style="font-size:11px;font-weight:500;letter-spacing:1.4px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">${dlbl}</div>
+    <h1 style="font-size:26px;font-weight:700">Hi Leo, let's go! 💪</h1>
+  </div>${ring(pct,`${done} of ${dh.length} done`)}`;
+
+  // Weekly cumulative habits card
+  if(wh.length){
+    html+=`<div class="card"><div class="ctit">⚡ Weekly cardio</div>`;
+    wh.forEach(h=>{
+      const sum=weeklySum(h.id,wdays);
+      const tgt=weeklyGoals[h.id]??h.wgMin;
+      const pct=Math.round(sum/tgt*100);
+      const col=sum>=tgt?'#639922':sum>=tgt*0.5?'#EF9F27':h.c;
+      const todayVal=dl[h.id]?.value??'';
+      html+=`<div style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+          <span style="font-size:20px">${h.icon}</span>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500">${h.name}</div>
+            <div style="font-size:12px;color:var(--text3)">${sum}/${tgt} ${h.unit} this week ${sum>=tgt?'✓':''}</div>
+          </div>
+          <input class="sm" type="number" placeholder="+min" value="${todayVal}" min="0"
+            onchange="setV('${t}','${h.id}',this.value);rToday()" style="width:62px;text-align:center">
+          <span style="font-size:11px;color:var(--text3);min-width:24px">today</span>
+        </div>
+        ${pb(pct,col)}
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // Daily habits grouped by category
+  CATS.forEach(cat=>{
+    const inCat=dh.filter(h=>h.cat===cat);
+    if(!inCat.length)return;
+    html+=`<div class="cat-h">${cat}</div>`;
+    inCat.forEach(h=>{
+      const e=dl[h.id]||{},dn=isDone(t,h),s=gStreak(h.id);
+      const weekN=daysDone(h.id,wdays);
+      const wgVal=goals[h.id]??h.wg;
+      const dailyTgt=h.bool?null:(goals[h.id+'_daily']??h.def);
+      html+=`<div class="hr${dn?' dn':''}">
+        <div class="chk${dn?' on':''}" onclick="tgT('${h.id}')">${dn?'✓':''}</div>
+        <span style="font-size:20px;flex-shrink:0">${h.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:500;color:var(--text);${dn?'text-decoration:line-through;opacity:.5':''}">${h.name}</div>
+          <div style="font-size:12px;font-weight:400;color:var(--text3)">${h.bool?`${wgVal}× / week`:`${dailyTgt} ${h.unit} · ${wgVal}× / week`}</div>
+        </div>
+        ${s>0?`<span class="bdg">🔥${s}</span>`:''}
+        <span class="bdg-wk">${weekN}/${wgVal}</span>
+        ${!h.bool?`<input class="sm" type="number" placeholder="${dailyTgt}" value="${e.value??''}"
+          onchange="setV('${t}','${h.id}',this.value);rToday()" onclick="event.stopPropagation()" style="width:58px;text-align:center">`:''}
+      </div>`;
+    });
+  });
+  document.getElementById('v-today').innerHTML=html;
+}
+function tgT(hid){tog(T(),hid);rToday();}
+
+/* ── WEEK ── */
+function rWeek(){
+  const wdays=weekOf(),dn=['M','T','W','T','F','S','S'],t=T();
+  const dh=dailyH(),wh=weeklyH();
+  let html=`<h2 style="margin-bottom:4px">This Week</h2>
+    <div style="font-size:13px;font-weight:400;color:var(--text3);margin-bottom:14px">Each habit has its own weekly goal</div>
+    <div class="wg" style="margin-bottom:8px"><div></div>
+    ${wdays.map((d,i)=>{
+      const isT=d===t;const[y,mo,dy]=d.split('-').map(Number);
+      return`<div style="text-align:center">
+        <div style="font-size:10px;font-weight:500;color:${isT?'var(--accent)':'var(--text3)'};margin-bottom:2px">${dn[i]}</div>
+        <div style="width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:${isT?700:400};background:${isT?'var(--accent)':'transparent'};color:${isT?'white':'var(--text)'}">
+          ${new Date(y,mo-1,dy).getDate()}</div>
+      </div>`;}).join('')}<div></div></div>`;
+
+  // Daily habits grid by category
+  CATS.forEach(cat=>{
+    const inCat=dh.filter(h=>h.cat===cat);
+    if(!inCat.length)return;
+    html+=`<div class="cat-h" style="margin-top:14px">${cat}</div>`;
+    inCat.forEach(h=>{
+      const n=daysDone(h.id,wdays);
+      const wgVal=goals[h.id]??h.wg;
+      const met=n>=wgVal;
+      html+=`<div class="wg"><span style="font-size:15px;text-align:center">${h.icon}</span>
+      ${wdays.map(d=>{
+        const ok=isDone(d,h),fut=d>t;
+        return`<div class="wc" onclick="tgW('${d}','${h.id}')"
+          style="background:${ok?h.c:'var(--bg3)'};opacity:${fut?.3:1};cursor:${fut?'default':'pointer'};color:${ok?'white':'transparent'}">${ok?'✓':''}</div>`;
+      }).join('')}
+      <div class="wcount" style="color:${met?'#639922':n>=Math.ceil(wgVal*0.6)?'#EF9F27':'#D85A30'}">${n}/${wgVal}${met?' ✓':''}</div></div>`;
+    });
+  });
+
+  // Weekly cumulative
+  if(wh.length){
+    html+=`<div class="cat-h" style="margin-top:14px">Weekly cardio (cumulative)</div>`;
+    wh.forEach(h=>{
+      const sum=weeklySum(h.id,wdays);
+      const tgt=weeklyGoals[h.id]??h.wgMin;
+      const pct=Math.round(sum/tgt*100);
+      const met=sum>=tgt;
+      const col=met?'#639922':sum>=tgt*0.5?'#EF9F27':'#D85A30';
+      html+=`<div style="background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+          <span style="font-size:18px">${h.icon}</span>
+          <span style="font-size:13px;font-weight:500;flex:1">${h.name}</span>
+          <span style="font-size:13px;font-weight:600;color:${col}">${sum}/${tgt} ${h.unit}${met?' ✓':''}</span>
+        </div>
+        ${pb(pct,col)}
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px">
+          ${wdays.map(d=>{
+            const v=logs[d]?.[h.id]?.value||0;
+            const fut=d>t;
+            return`<div style="height:22px;border-radius:4px;background:${v>0?h.c:'var(--bg3)'};opacity:${fut?.3:1};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:${v>0?'white':'var(--text3)'}">${v||''}</div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+  }
+
+  // Overall summary
+  const allHabits=H();
+  const goalsMet=allHabits.filter(h=>{
+    if(h.weekly){return weeklySum(h.id,wdays)>=(weeklyGoals[h.id]??h.wgMin);}
+    return daysDone(h.id,wdays)>=(goals[h.id]??h.wg);
+  }).length;
+  const overallPct=Math.round(goalsMet/allHabits.length*100);
+  const col=overallPct>=70?'#639922':overallPct>=40?'#EF9F27':'#D85A30';
+  html+=`<div class="card" style="margin-top:14px">
+    <div class="ctit">Week summary</div>
+    <div style="background:var(--bg2);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:32px;font-weight:700;color:${col};min-width:72px">${goalsMet}<span style="font-size:16px;color:var(--text3);font-weight:400">/${allHabits.length}</span></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">habits on track this week</div>
+        ${pb(overallPct,col)}
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('v-week').innerHTML=html;
+}
+function tgW(date,hid){if(date>T())return;tog(date,hid);rWeek();}
+
+/* ── MONTH ── */
+function rMonth(){
+  const{y,m}=calDate,days=mDays(y,m),t=T();
+  const dh=dailyH(),allH=H();
+  const mLbl=new Date(y,m).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const sc=s=>{if(!s)return'var(--bg3)';if(s<.3)return'#B5D4F4';if(s<.6)return'#85B7EB';if(s<.85)return'#378ADD';return'#185FA5';};
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <button onclick="mvM(-1)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);padding:4px 12px">‹</button>
+    <h2 style="font-size:20px">${mLbl}</h2>
+    <button onclick="mvM(1)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);padding:4px 12px">›</button>
+  </div>
+  <div class="cg">${['M','T','W','T','F','S','S'].map(l=>`<div style="text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:2px 0">${l}</div>`).join('')}
+  ${days.map(({date,own})=>{
+    const preStart=date<START_DATE;
+    const active=own&&!preStart&&date<=t;
+    const s=active?dScore(date):0;
+    const isT=date===t,fut=date>t,isSel=selDay===date;
+    const bg=active?sc(s):'var(--bg2)';
+    const tc=s>.5&&active?'white':'var(--text)';
+    const n=active?dh.filter(h=>isDone(date,h)).length:0;
+    const[dy,dm,dd]=date.split('-').map(Number);
+    const opacity=own?(preStart?.35:1):.3;
+    const clk=active?`onclick="selD('${date}')" style="cursor:pointer;`:'style="cursor:default;';
+    return`<div class="cd" ${clk}background:${bg};opacity:${opacity};border:${isT?'2px solid var(--text)':isSel?'2px solid var(--accent)':'1px solid transparent'}">
+      <span style="color:${tc};font-weight:${isT?700:400};font-size:12px">${new Date(dy,dm-1,dd).getDate()}</span>
+      ${n>0&&active?`<span style="font-size:9px;font-weight:500;color:${s>.5?'rgba(255,255,255,.85)':'var(--text3)'}">${n}/${dh.length}</span>`:''}
+    </div>`;
+  }).join('')}</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px">
+    <span style="font-size:10px;font-weight:500;color:var(--text3)">less</span>
+    ${['var(--bg3)','#B5D4F4','#85B7EB','#378ADD','#185FA5'].map(c=>`<div style="width:18px;height:8px;border-radius:2px;background:${c}"></div>`).join('')}
+    <span style="font-size:10px;font-weight:500;color:var(--text3)">more</span>
+  </div>
+  ${(()=>{
+    /* Show start-date hint when viewing a month that contains it */
+    const[sy,sm]=START_DATE.split('-').map(Number);
+    if(y===sy&&m===sm-1){
+      return`<div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;font-style:italic">Started tracking on May 11, 2026</div>`;
+    }
+    return'';
+  })()}`;
+  if(selDay){
+    const[sy,sm,sd]=selDay.split('-').map(Number);
+    html+=`<div class="card" style="margin-top:12px">
+      <div class="ctit">${new Date(sy,sm-1,sd).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${allH.map(h=>{
+          const e=logs[selDay]?.[h.id];
+          const dn=h.weekly?(e?.value>0):isDone(selDay,h);
+          const valTxt=h.weekly&&e?.value?` ${e.value}${h.unit}`:'';
+          return`<div style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:${dn?'var(--bg2)':'var(--bg)'};border:.5px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="font-size:16px">${h.icon}</span>
+            <span style="font-size:12px;font-weight:${dn?500:400};flex:1;color:${dn?'var(--text)':'var(--text3)'}">${h.name}${valTxt}</span>
+            <span style="font-size:14px">${dn?'✓':'·'}</span>
+          </div>`;}).join('')}
+      </div></div>`;
+  }
+  document.getElementById('v-month').innerHTML=html;
+}
+function mvM(dir){const d=new Date(calDate.y,calDate.m+dir);calDate={y:d.getFullYear(),m:d.getMonth()};selDay=null;rMonth();}
+function selD(date){selDay=selDay===date?null:date;rMonth();}
+
+/* ── TRENDS ── */
+const PERIODS=[{l:'7 days',d:7},{l:'30 days',d:30},{l:'90 days',d:90},{l:'6 months',d:180}];
+function setTrend(d){trendDays=d;trendMode='preset';rTrends();}
+function applyCustomRange(){
+  const f=document.getElementById('tr-from')?.value;
+  const to=document.getElementById('tr-to')?.value;
+  if(!f||!to){alert('Please select both dates.');return;}
+  if(f>to){alert('Start date must be before end date.');return;}
+  trendFrom=f;trendTo=to;trendMode='custom';rTrends();
+}
+
+function rTrends(){
+  const t=T(),lN=getTrendDays(),allH=H(),dh=dailyH();
+  const pastDays=lN.filter(d=>d<=t&&d>=START_DATE);
+  const span=lN.length;
+  const prev=Array.from({length:span},(_,i)=>addD(lN[0],-(span-i)));
+  const avgN=pastDays.length?Math.round(pastDays.reduce((s,d)=>s+dScore(d),0)/pastDays.length*100):0;
+  const prevPast=prev.filter(d=>d<=t&&d>=START_DATE);
+  const avgP=prevPast.length?Math.round(prevPast.reduce((s,d)=>s+dScore(d),0)/prevPast.length*100):0;
+  const delta=avgN-avgP;
+  const{g,c:gc}=gGrade(avgN);
+
+  const weeks=splitWeeks(lN);
+  const completeWeeks=weeks.filter(w=>w[w.length-1]<=t&&w[0]>=START_DATE);
+
+  const cData=allH.map(h=>{
+    const wc=gWeeklyCons(h,lN);
+    return{...h,wc};
+  }).sort((a,b)=>(b.wc?.pct??0)-(a.wc?.pct??0));
+
+  // weeks where ≥70% of habits met goal
+  const weekScores=completeWeeks.map(w=>{
+    const met=allH.filter(h=>{
+      if(h.weekly){return weeklySum(h.id,w)>=(weeklyGoals[h.id]??h.wgMin);}
+      return daysDone(h.id,w)>=(goals[h.id]??h.wg);
+    }).length;
+    return Math.round(met/allH.length*100);
+  });
+  const weeksGoalMet=weekScores.filter(s=>s>=70).length;
+
+  const ins=[];
+  const best=cData[0];
+  if(best?.wc?.met>0)ins.push(`${best.icon} <b>${best.name}</b> hit goal in <b>${best.wc.met}/${best.wc.total} weeks</b> — strongest! 💪`);
+  const worst=cData[cData.length-1];
+  if(worst?.wc&&worst.wc.pct<60)ins.push(`${worst.icon} <b>${worst.name}</b> met goal in only <b>${worst.wc.met}/${worst.wc.total} weeks</b>. Room to grow.`);
+  if(delta>5)ins.push(`Daily score improved <b>${delta}%</b> vs previous period! 🚀`);
+  else if(delta<-5)ins.push(`Score dipped <b>${Math.abs(delta)}%</b> vs previous period. Refocus time.`);
+  const top=allH.filter(h=>!h.weekly).map(h=>({...h,s:gStreak(h.id)})).filter(h=>h.s>2).sort((a,b)=>b.s-a.s)[0];
+  if(top)ins.push(`${top.icon} <b>${top.name}</b> on a <b>${top.s}-day streak</b>! 🔥`);
+  if(!ins.length)ins.push('Start logging habits to see personalized insights. 🌱');
+
+  const rangeLabel=trendMode==='custom'?`${trendFrom} → ${trendTo}`:`last ${trendDays} days`;
+
+  document.getElementById('v-trends').innerHTML=`
+    <h2 style="margin-bottom:12px">Trends</h2>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
+      ${PERIODS.map(p=>`<button class="fbtn${trendMode==='preset'&&trendDays===p.d?' on':''}" onclick="setTrend(${p.d})">${p.l}</button>`).join('')}
+      <button class="fbtn${trendMode==='custom'?' on':''}" onclick="toggleDatePicker()">Custom range</button>
+    </div>
+    <div id="date-picker" style="display:${trendMode==='custom'?'block':'none'};background:var(--bg2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:4px">From</div>
+          <input type="date" id="tr-from" value="${trendFrom||addD(T(),-30)}" max="${T()}"></div>
+        <div><div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:4px">To</div>
+          <input type="date" id="tr-to" value="${trendTo||T()}" max="${T()}"></div>
+      </div>
+      <button onclick="applyCustomRange()" style="width:100%;padding:9px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Apply</button>
+    </div>
+
+    <div class="g2">
+      <div class="mc"><div class="ml">Overall grade</div><div class="mv" style="color:${gc}">${g}</div><div class="ms">${avgN}% daily avg</div></div>
+      <div class="mc"><div class="ml">Weeks on track</div><div class="mv" style="color:${weeksGoalMet===completeWeeks.length&&completeWeeks.length>0?'#639922':'#EF9F27'}">${weeksGoalMet}/${completeWeeks.length}</div><div class="ms">≥70% habits on target</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">Weekly goal completion · ${rangeLabel}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">% of weeks each habit hit its target</div>
+      ${cData.map(h=>{
+        const wc=h.wc;
+        const tgtTxt=h.weekly?`${weeklyGoals[h.id]??h.wgMin} ${h.unit}/wk`:`${goals[h.id]??h.wg}×/wk`;
+        if(!wc||wc.total===0)return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">${h.icon} ${h.name}</span><span style="font-size:11px;color:var(--text3)">No data</span></div></div>`;
+        const col=wc.pct>=70?'#639922':wc.pct>=40?'#EF9F27':'#D85A30';
+        return`<div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:500;color:var(--text)">${h.icon} ${h.name} <span style="font-size:11px;color:var(--text3);font-weight:400">(${tgtTxt})</span></span>
+            <span style="font-size:13px;font-weight:500;color:${col}">${wc.met}/${wc.total} · ${wc.pct}%</span>
+          </div>${pb(wc.pct,col)}</div>`;
+      }).join('')}
+    </div>
+
+    <div class="card">
+      <div class="ctit">Daily score · ${rangeLabel}</div>
+      <div style="position:relative;height:150px"><canvas id="sc"></canvas></div>
+    </div>
+
+    <div class="card"><div class="ctit">⚠️ Needs attention</div>
+      ${[...cData].reverse().slice(0,3).map((h,i)=>`
+        <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:7px">
+          <span style="font-size:14px;font-weight:700;color:var(--accent);min-width:22px">#${i+1}</span>
+          <span style="font-size:17px">${h.icon}</span>
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">${h.name}</div>
+          <div style="font-size:12px;color:var(--text3)">${h.wc?`${h.wc.met}/${h.wc.total} weeks goal met`:'No data'}</div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card"><div class="ctit">💡 Key insights</div>
+      ${ins.map(tx=>`<div class="ins">${tx}</div>`).join('')}
+    </div>`;
+
+  setTimeout(()=>{
+    const ctx=document.getElementById('sc')?.getContext('2d');if(!ctx)return;
+    if(scoreChart){scoreChart.destroy();scoreChart=null;}
+    const data=lN.map(d=>d<=t?Math.round(dScore(d)*100):null);
+    const skip=Math.max(1,Math.floor(lN.length/8));
+    const labels=lN.map((d,i)=>{
+      if(i===0||i%skip===0){const[y,m,dy]=d.split('-').map(Number);return new Date(y,m-1,dy).toLocaleDateString('en-US',{day:'numeric',month:'short'});}return'';
+    });
+    scoreChart=new Chart(ctx,{
+      type:'line',data:{labels,datasets:[{data,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.10)',fill:true,tension:.4,pointRadius:0,borderWidth:2.5,spanGaps:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{ticks:{font:{size:10,family:'Inter'},color:'#888780'},grid:{display:false}},
+          y:{min:0,max:100,ticks:{font:{size:10,family:'Inter'},color:'#888780',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+    });
+  },100);
+}
+function toggleDatePicker(){
+  const dp=document.getElementById('date-picker');if(!dp)return;
+  const showing=dp.style.display==='block';
+  dp.style.display=showing?'none':'block';
+  if(!showing){trendMode='custom';rTrends();}
+}
+
+/* ── GOALS ── */
+function rGoals(){
+  const allH=H();
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <h2>Leo's goals</h2>
+    <button class="sbtn2" onclick="openModal()">+ New habit</button>
+  </div>
+  <div style="font-size:13px;font-weight:400;color:var(--text3);margin-bottom:16px">Each habit has its own weekly target</div>`;
+
+  CATS.forEach(cat=>{
+    const inCat=allH.filter(h=>h.cat===cat);
+    if(!inCat.length)return;
+    html+=`<div class="card"><div class="ctit">${cat}</div>`;
+    inCat.forEach(h=>{
+      html+=`<div style="padding:10px 0;border-bottom:.5px solid var(--border)">
+        <div id="name-disp-${h.id}" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:20px">${h.icon}</span>
+          <span style="font-size:14px;font-weight:500;flex:1">${h.name}</span>
+          <button class="edit-btn" onclick="startEdit('${h.id}')">✏️</button>
+          ${h.custom?`<button class="del-btn" onclick="deleteHabit('${h.id}')" title="Remove">🗑</button>`:''}
+        </div>
+        <div id="name-edit-${h.id}" style="display:none;margin-bottom:8px;padding-left:30px">
+          <input type="text" id="ni-${h.id}" value="${h.name.replace(/"/g,'&quot;')}" maxlength="30" style="font-size:13px;padding:6px 10px">
+          <div style="display:flex;gap:6px;margin-top:5px">
+            <button onclick="saveName('${h.id}')" style="padding:5px 14px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Save</button>
+            <button onclick="cancelEdit('${h.id}')" style="padding:5px 14px;background:var(--bg3);color:var(--text);border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;padding-left:30px;flex-wrap:wrap">
+          ${h.weekly?
+            `<span style="font-size:12px;color:var(--text3)">Weekly target:</span>
+             <input class="sm" type="number" id="wgm_${h.id}" value="${weeklyGoals[h.id]??h.wgMin}" min="0" style="width:64px;text-align:center">
+             <span style="font-size:12px;color:var(--text3)">${h.unit}/week</span>`:
+            (h.bool?
+              `<span style="font-size:12px;color:var(--text3)">Days per week:</span>
+               <input class="sm" type="number" id="g_${h.id}" value="${goals[h.id]??h.wg}" min="0" max="7" style="width:48px;text-align:center">
+               <span style="font-size:12px;color:var(--text3)">/ 7</span>`:
+              `<input class="sm" type="number" id="gd_${h.id}" value="${goals[h.id+'_daily']??h.def}" min="0" style="width:56px;text-align:center">
+               <span style="font-size:12px;color:var(--text3)">${h.unit} ·</span>
+               <input class="sm" type="number" id="g_${h.id}" value="${goals[h.id]??h.wg}" min="0" max="7" style="width:48px;text-align:center">
+               <span style="font-size:12px;color:var(--text3)">days/wk</span>`)
+          }
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
+  html+=`<button class="sbtn" onclick="saveGoals()">Save targets</button>
+  <div id="gsaved" style="text-align:center;font-size:13px;font-weight:500;color:#639922;margin-top:10px;opacity:0;transition:opacity .4s"></div>`;
+
+  document.getElementById('v-goals').innerHTML=html;
+}
+
+/* ── MODAL ── */
+function openModal(){
+  document.getElementById('modal').classList.remove('modal-hidden');
+  setTimeout(()=>document.getElementById('new-name').focus(),50);
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modal'))return;
+  document.getElementById('modal').classList.add('modal-hidden');
+  document.getElementById('modal-err').textContent='';
+}
+function setType(t){
+  newType=t;
+  document.getElementById('tbtn-bool').classList.toggle('on',t==='bool');
+  document.getElementById('tbtn-num').classList.toggle('on',t==='num');
+  document.getElementById('num-fields').style.display=t==='num'?'block':'none';
+}
+function pickColor(el){
+  document.querySelectorAll('.clr-dot').forEach(d=>d.classList.remove('on'));
+  el.classList.add('on');newColor=el.dataset.c;
+}
+function addHabit(){
+  const name=document.getElementById('new-name').value.trim();
+  const icon=document.getElementById('new-icon').value.trim()||'⭐';
+  const cat=document.getElementById('new-cat').value;
+  const wg=+document.getElementById('new-wg').value||5;
+  if(!name){document.getElementById('modal-err').textContent='Please enter a habit name.';return;}
+  const id='custom_'+Date.now();
+  const isBool=newType==='bool';
+  const unit=isBool?'':(document.getElementById('new-unit').value.trim()||'');
+  const def=isBool?1:(+document.getElementById('new-def').value||1);
+  const h={id,name,icon,unit,def,c:newColor,bool:isBool,custom:true,wg,cat};
+  customH.push(h);
+  goals[h.id]=wg;
+  if(!isBool)goals[h.id+'_daily']=def;
+  save();
+  document.getElementById('modal').classList.add('modal-hidden');
+  document.getElementById('new-name').value='';
+  document.getElementById('new-icon').value='⭐';
+  document.getElementById('new-unit').value='';
+  document.getElementById('new-def').value='';
+  document.getElementById('new-wg').value='5';
+  setType('bool');
+  document.getElementById('modal-err').textContent='';
+  rGoals();
+}
+function deleteHabit(id){
+  if(!confirm('Remove this habit? Past logs will be kept but hidden.'))return;
+  customH=customH.filter(h=>h.id!==id);
+  save();rGoals();
+}
+function startEdit(id){
+  document.getElementById('name-disp-'+id).style.display='none';
+  document.getElementById('name-edit-'+id).style.display='block';
+  const inp=document.getElementById('ni-'+id);if(inp){inp.focus();inp.select();}
+}
+function cancelEdit(id){
+  document.getElementById('name-disp-'+id).style.display='flex';
+  document.getElementById('name-edit-'+id).style.display='none';
+}
+function saveName(id){
+  const inp=document.getElementById('ni-'+id);if(!inp)return;
+  const v=inp.value.trim();if(!v)return;
+  habitNames[id]=v;save();rGoals();
+}
+
+function saveGoals(){
+  H().forEach(h=>{
+    if(h.weekly){
+      const el=document.getElementById('wgm_'+h.id);if(el)weeklyGoals[h.id]=+el.value;
+    }else{
+      const el=document.getElementById('g_'+h.id);if(el)goals[h.id]=+el.value;
+      if(!h.bool){const el2=document.getElementById('gd_'+h.id);if(el2)goals[h.id+'_daily']=+el2.value;}
+    }
+  });
+  save();
+  const el=document.getElementById('gsaved');if(el){el.textContent='Targets saved! ✓';el.style.opacity=1;setTimeout(()=>el.style.opacity=0,2500);}
+}
+
+load();rNav();rToday();
+</script>
+</body>
+</html>
